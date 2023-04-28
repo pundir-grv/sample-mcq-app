@@ -1,0 +1,91 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcq-app
+  labels:
+    app: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: flask-app
+          image: cloud.canister.io:5000/techtoabroad/mcq-app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: dbUser
+              valueFrom:
+                secretKeyRef: 
+                  name: mysql-secret
+                  key: username
+            - name: dbPassword
+              valueFrom:
+                secretKeyRef: 
+                  name: mysql-secret
+                  key: password
+            - name: redisPassword
+              valueFrom:
+                secretKeyRef: 
+                  name: redis-secret
+                  key: password
+            - name: SUPABASE_ANON_KEY
+              valueFrom:
+                secretKeyRef: 
+                  name: supabase-secret
+                  key: passkey
+            - name: flaskSessionKey
+              valueFrom:
+                secretKeyRef: 
+                  name: flask-secret
+                  key: passkey
+            - name: dbHost
+              valueFrom:
+                configMapKeyRef: 
+                  name: mysql-config
+                  key: host
+            - name: dbPort
+              valueFrom:
+                configMapKeyRef: 
+                  name: mysql-config
+                  key: port
+            - name: dbName
+              valueFrom:
+                configMapKeyRef: 
+                  name: mysql-config
+                  key: db
+            - name: redisHost
+              valueFrom:
+                configMapKeyRef: 
+                  name: redis-config
+                  key: host
+            - name: redisPort
+              valueFrom:
+                configMapKeyRef: 
+                  name: redis-config
+                  key: port
+            - name: redisDbIdx
+              valueFrom:
+                configMapKeyRef: 
+                  name: redis-config
+                  key: dbIdx
+            - name: SUPABASE_URL
+              valueFrom:
+                configMapKeyRef: 
+                  name: supabase-config
+                  key: host
+            - name: flaskSessionTime
+              valueFrom:
+                configMapKeyRef: 
+                  name: flask-config
+                  key: sessiontime
+            
